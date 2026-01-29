@@ -2,888 +2,234 @@
 <html lang="en">
 <head>
     <base href="https://cdn.jsdelivr.net/gh/gn-math/gn-math.github.io@main/">
-    <link rel="icon" type="image/png" url="https://pbs.twimg.com/profile_images/1676663837423194112/yw0xwYoT_400x400.jpg">
+    <link rel="icon" type="image/png" href="https://pbs.twimg.com/profile_images/1676663837423194112/yw0xwYoT_400x400.jpg">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>bsd-nb</title>
+    <title>bsd-nb | v2.1</title>
     
-    <!-- Authentication Styles -->
     <style>
-        /* Password Screen and Admin Panel Styles */
-        #passwordScreen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
+        /* UI & AUTH STYLES */
+        :root { 
+            --primary: #44f00f; 
+            --bg: #0f172a; 
+            --text: #f1f5f9; 
+            --surface: #1e293b; 
+            --border: #334155; 
+            --radius-lg: 16px; 
+            --gradient-primary: linear-gradient(135deg, #1bf05bfb 0%, #ff4d75 100%); 
         }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; overflow-x: hidden; }
+        
+        #passwordScreen { position: fixed; inset: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; z-index: 10000; }
+        .password-box { background: rgba(255, 255, 255, 0.95); border-radius: 20px; padding: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 400px; width: 90%; text-align: center; color: #333; }
+        .password-box input { width: 100%; padding: 15px; margin-bottom: 15px; border: 2px solid #e0e0e0; border-radius: 10px; box-sizing: border-box; }
+        .password-box button { width: 100%; padding: 15px; background: #667eea; color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; }
 
-        .password-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
+        header { background: var(--gradient-primary); padding: 1rem; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .header-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 15px; }
+        
+        .search-container { display: flex; gap: 10px; flex: 1; max-width: 600px; }
+        #searchBar { padding: 12px; border-radius: 8px; border: none; flex: 2; background: rgba(255,255,255,0.2); color: white; outline: none; }
+        #searchBar::placeholder { color: rgba(255,255,255,0.7); }
 
-        .password-box {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 400px;
-            width: 100%;
-            text-align: center;
-            animation: slideIn 0.5s ease;
-        }
+        /* GAME GRID */
+        #container, #featuredZones { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1.5rem; padding: 20px; }
+        .zone-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; cursor: pointer; transition: 0.3s ease; position: relative; }
+        .zone-item:hover { transform: translateY(-8px); border-color: var(--primary); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
+        .zone-item img { width: 100%; aspect-ratio: 1; object-fit: cover; }
+        .zone-item .info { padding: 12px; text-align: center; font-weight: bold; font-size: 0.9rem; }
 
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+        /* MODALS */
+        #changelogModal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; display: none; align-items: center; justify-content: center; }
+        .modal-content { background: var(--surface); padding: 30px; border-radius: 20px; max-width: 500px; width: 90%; border: 1px solid var(--primary); }
 
-        .password-box h1 {
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 2rem;
-        }
-
-        .password-box p {
-            color: #666;
-            margin-bottom: 20px;
-        }
-
-        .password-box input[type="password"],
-        .password-box input[type="text"] {
-            width: 100%;
-            padding: 15px;
-            margin-bottom: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            box-sizing: border-box;
-        }
-
-        .password-box input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .password-box button {
-            width: 100%;
-            padding: 15px;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .password-box button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .password-box .admin-btn {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        }
-
-        .password-box .back-btn {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        }
-
-        .error {
-            color: #f5576c;
-            font-weight: 600;
-            margin-top: 10px;
-            min-height: 20px;
-        }
-
-        .success {
-            color: #4caf50;
-            font-weight: 600;
-            margin-top: 10px;
-        }
-
-        /* Admin Panel Styles */
-        #adminPanel {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            overflow-y: auto;
-            z-index: 10000;
-        }
-
-        .admin-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 40px 20px;
-        }
-
-        .admin-box {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 700px;
-            width: 100%;
-            animation: slideIn 0.5s ease;
-        }
-
-        .admin-box h1 {
-            color: #333;
-            margin-bottom: 30px;
-            font-size: 2rem;
-            text-align: center;
-        }
-
-        .admin-section {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 25px;
-            border-left: 4px solid #667eea;
-        }
-
-        .admin-section h2 {
-            color: #333;
-            margin-bottom: 15px;
-            font-size: 1.3rem;
-        }
-
-        .admin-section input[type="text"],
-        .admin-section textarea {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 14px;
-            font-family: inherit;
-            transition: all 0.3s ease;
-            box-sizing: border-box;
-        }
-
-        .admin-section input:focus,
-        .admin-section textarea:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .admin-section textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        .admin-section label {
-            display: block;
-            margin-bottom: 15px;
-            color: #555;
-            font-weight: 500;
-        }
-
-        .admin-section input[type="checkbox"] {
-            margin-right: 8px;
-            cursor: pointer;
-        }
-
-        .admin-section button {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .admin-section button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .logout-btn {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #f5576c 0%, #e84393 100%) !important;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 20px;
-        }
-
-        .logout-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(245, 87, 108, 0.4);
-        }
-
-        /* Hide main content by default */
-        .content-hidden {
-            display: none !important;
-        }
-    </style>
-    
-    <!-- Original Styles -->
-    <style>
-        :root {
-    --primary: #1694dd;
-    --primary-hover: #21e90f;
-    --primary-light: rgba(252, 38, 81, 0.1);
-    --primary-lighter: rgba(252, 38, 81, 0.05);
-    --accent: #1130dd;
-    --accent-light: rgba(15, 223, 60, 0.1);
-    --success: #10b981;
-    --warning: #f59e0b;
-    --text: #1a1a1a;
-    --text-muted: #6b7280;
-    --text-light: #9ca3af;
-    --bg: #ffffff;
-    --bg-secondary: #f8fafc;
-    --surface: #ffffff;
-    --surface-hover: #f1f5f9;
-    --border: #e2e8f0;
-    --border-light: #f1f5f9;
-    --glass: rgba(255, 255, 255, 0.8);
-    --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-    --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-    --shadow-glow: 0 0 20px rgba(252, 38, 81, 0.3);
-    --radius: 12px;
-    --radius-sm: 8px;
-    --radius-lg: 16px;
-    --radius-xl: 20px;
-    --gradient-primary: linear-gradient(135deg, #44f00f 0%, #44f00f 100%);
-    --gradient-accent: linear-gradient(135deg, #44f00f 0%, #44f00f 100%);
-    --gradient-surface: linear-gradient(135deg, #44f00f 0%, #44f00f 100%);
-}
-
-.dark-mode {
-    --primary: #44f00f;
-    --primary-hover: #44f00f;
-    --primary-light: rgba(252, 38, 81, 0.15);
-    --primary-lighter: rgba(252, 38, 81, 0.08);
-    --accent: #a855f7;
-    --accent-light: rgba(168, 85, 247, 0.15);
-    --success: #34d399;
-    --warning: #fbbf24;
-    --text: #f1f5f9;
-    --text-muted: #006aff;
-    --text-light: #64748b;
-    --bg: #0f172a;
-    --bg-secondary: #1e293b;
-    --surface: #1e293b;
-    --surface-hover: #334155;
-    --border: #334155;
-    --border-light: #475569;
-    --glass: rgba(30, 41, 59, 0.8);
-    --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.4);
-    --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.5), 0 1px 2px -1px rgb(0 0 0 / 0.5);
-    --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.5);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.6), 0 4px 6px -4px rgb(0 0 0 / 0.6);
-    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.7), 0 8px 10px -6px rgb(0 0 0 / 0.7);
-    --shadow-glow: 0 0 20px rgba(252, 38, 81, 0.4);
-    --gradient-primary: linear-gradient(135deg, #1bf05bfb 0%, #ff4d75 100%);
-    --gradient-accent: linear-gradient(135deg, #a855f7 0%, #9333ea 100%);
-    --gradient-surface: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-}
-
-* {
-    box-sizing: border-box;
-}
-
-body {
-    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
-    line-height: 1.6;
-    margin: 0;
-    padding: 0;
-    background: var(--bg);
-    color: var(--text);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    font-weight: 400;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
-
-header {
-    background: var(--gradient-primary);
-    color: white;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: var(--shadow-lg);
-    backdrop-filter: blur(20px);
-}
-
-.header-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 1.25rem 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1.5rem;
-}
-
-.logo {
-    font-size: 1.75rem;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.8) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.search-container {
-    display: flex;
-    flex: 1;
-    max-width: 500px;
-    gap: 0.75rem;
-}
-
-#searchBar {
-    flex: 1;
-    padding: 0.875rem 1rem;
-    border: 0;
-    border-radius: var(--radius);
-    background: var(--glass);
-    backdrop-filter: blur(20px);
-    color: var(--text);
-    font-size: 15px;
-    outline: none;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: var(--shadow-sm);
-}
-
-#searchBar:focus {
-    background: var(--text);
-    box-shadow: 0 0 0 3px rgba(252, 38, 81, 0.25), var(--shadow);
-    transform: translateY(-1px);
-    color: var(--glass);
-}
-
-#searchBar::placeholder {
-    color: var(--text-muted);
-}
-
-#sortOptions {
-    padding: 0.875rem 1rem;
-    border: 0;
-    border-radius: var(--radius);
-    background: var(--glass);
-    backdrop-filter: blur(20px);
-    color: var(--text-muted);
-    font-size: 15px;
-    cursor: pointer;
-    outline: none;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    min-width: 130px;
-    box-shadow: var(--shadow-sm);
-}
-
-#sortOptions:hover {
-    background: var(--text);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow);
-    color: var(--glass);
-}
-
-#filterOptions {
-    padding: 0.875rem 1rem;
-    border: 0;
-    border-radius: var(--radius);
-    background: var(--glass);
-    backdrop-filter: blur(20px);
-    color: var(--text-muted);
-    font-size: 15px;
-    cursor: pointer;
-    outline: none;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    min-width: 130px;
-    box-shadow: var(--shadow-sm);
-}
-
-#filterOptions:hover {
-    background: var(--text);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow);
-    color: var(--glass);
-}
-
-.control-buttons {
-    display: flex;
-    gap: 0.5rem;
-}
-
-main {
-    margin: 0 auto;
-    padding: 2rem 1rem;
-    padding-bottom: 6rem;
-}
-
-#zoneCount {
-    margin: 0 0 1.5rem;
-    font-size: 14px;
-    color: var(--text-muted);
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-#zoneCount::before {
-    content: '';
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    background: var(--primary);
-}
-
-#container,
-#featuredZones {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1.5rem;
-}
-
-.zone-item {
-    background: var(--gradient-surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    box-shadow: var(--shadow-sm);
-}
-
-.zone-item:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: var(--shadow-xl);
-    border-color: var(--primary);
-}
-
-.zone-item:hover::before {
-    opacity: 1;
-}
-
-.zone-item::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: var(--primary-light);
-    opacity: 0;
-    transition: opacity 0.4s ease;
-    pointer-events: none;
-    z-index: 1;
-}
-
-.zone-item img {
-    width: 100%;
-    aspect-ratio: 1;
-    object-fit: cover;
-    display: block;
-    background: var(--border-light);
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.zone-item:hover img {
-    transform: scale(1.05);
-}
-
-.zone-item button {
-    background: transparent;
-    color: var(--text);
-    border: 0;
-    padding: 1.25rem 1rem;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 14px;
-    line-height: 1.4;
-    text-align: center;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    min-height: 70px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    z-index: 2;
-}
-
-.zone-item:hover button {
-    color: var(--primary);
-    background: rgba(252, 38, 81, 0.05);
-}
-
-footer {
-    background: var(--bg-secondary);
-    border-top: 1px solid var(--border);
-    padding: 1rem 1rem;
-    text-align: center;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    z-index: 100;
-}
-
-.footer-links {
-    display: flex;
-    justify-content: center;
-    gap: 2rem;
-    flex-wrap: wrap;
-}
-
-.footer-links a {
-    color: var(--primary);
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 15px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    padding: 0.5rem 1rem;
-    border-radius: var(--radius);
-}
-
-.footer-links a:hover {
-    color: var(--primary-hover);
-    background: var(--primary-light);
-    transform: translateY(-1px);
-}
+        #zoneViewer { position: fixed; inset: 0; background: #000; z-index: 3000; display: none; flex-direction: column; }
+        #zoneFrame { flex-grow: 1; border: none; width: 100%; height: 100%; }
+        .zone-header { background: #1a1a1a; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; color: white; }
+        
+        .btn-action { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn-close { background: #ff4d4d; color: white; }
+        .btn-tab { background: var(--primary); color: #000; margin-right: 10px; }
+        
+        .content-hidden { display: none !important; }
+        hr { border: 0; border-top: 1px solid var(--border); margin: 20px; }
     </style>
 </head>
-<body class="dark-mode">
-    <!-- Main Content (will be hidden initially) -->
+<body>
+
+    <div id="passwordScreen" class="content-hidden">
+        <div class="password-box">
+            <h1 style="margin-top:0">🎮 restricted</h1>
+            <p>Please enter the access key</p>
+            <input type="password" id="passwordInput" placeholder="Password...">
+            <button onclick="checkPassword()">Verify Access</button>
+            <p id="passwordError" style="color: #ff4d4d; margin-top: 10px; font-weight: bold;"></p>
+        </div>
+    </div>
+
+    <div id="changelogModal">
+        <div class="modal-content">
+            <h2 style="color: var(--primary); margin-top: 0;">🚀 What's New?</h2>
+            <div id="changelogBody" style="line-height: 1.6; margin-bottom: 20px;">
+                </div>
+            <button class="btn-action" style="width: 100%; background: var(--primary);" onclick="closeChangelog()">Got it!</button>
+        </div>
+    </div>
+
     <div id="mainContent" class="content-hidden">
         <header>
             <div class="header-content">
-                <div class="logo">lowk was easy</div>
+                <div style="font-weight:900; letter-spacing:-1px; font-size:1.4rem">lowk was easy</div>
                 <div class="search-container">
-                    <input type="text" id="searchBar" placeholder="Search zones..." oninput="filterZones()">
-                    <select id="sortOptions" onchange="sortZones()">
-                        <option value="name">Name</option>
-                        <option value="id">ID (Date)</option>
-                        <option value="popular">Popular</option>
-                    </select>
-                    <select id="filterOptions" onchange="filterZones2()">
-                        <option value="none">(SELECT TAG)</option>
-                    </select>
+                    <input type="text" id="searchBar" placeholder="Search for a game..." oninput="filterZones()">
                 </div>
+                <button onclick="logout()" style="background:none; color:white; border:1px solid rgba(255,255,255,0.3); padding:8px 12px; border-radius:6px; cursor:pointer;">Logout</button>
             </div>
         </header>
 
-        <main>
-            <details id="featuredZonesWrapper" open>
-                <summary id="allZonesSummary" style="font-size: 1.2rem; font-weight: bold; cursor: pointer;">Featured Zones</summary>
-                <div id="featuredZones" class="zone-container"></div>
-            </details>
-            <br><hr><br>
-            <details id="allZonesWrapper" open>
-                <summary id="allSummary" style="font-size: 1.2rem; font-weight: bold; cursor: pointer;">All Zones</summary>
-                <div id="container">Loading...</div>
-            </details>
+        <main style="max-width: 1200px; margin: auto; padding-bottom: 100px;">
+            <h2 style="padding: 20px 20px 0; color: var(--primary)">⭐ Featured</h2>
+            <div id="featuredZones"></div>
+            <hr>
+            <h2 style="padding: 0 20px;">📂 Library</h2>
+            <div id="container">Loading components...</div>
         </main>
-
-        <footer>
-            <div class="footer-links">
-                <a href="#" onclick="loadDMCA(); return false;">DMCA</a>
-                <a href="#" onclick="loadName(); return false;">made by orr</a>
-                <a href="#" onclick="loadPrivacy(); return false;">Privacy Policy</a>
-            </div>
-        </footer>
     </div>
 
-    <!-- Authentication Script -->
+    <div id="zoneViewer">
+        <div class="zone-header">
+            <span id="activeGameTitle" style="font-weight: bold; font-size: 1.1rem;">Game</span>
+            <div>
+                <button class="btn-action btn-tab" onclick="openInNewTab()">Open in New Tab</button>
+                <button class="btn-action btn-close" onclick="closeZone()">Close</button>
+            </div>
+        </div>
+        <iframe id="zoneFrame"></iframe>
+    </div>
+
     <script>
-        // Authentication System
-        const DEFAULT_USER_PASSWORD = 'unblockedproxyjet';
-        const ADMIN_PASSWORD = 'Admin10419!';
+        const CONFIG = {
+            DEFAULT_PASS: 'unblockedproxyjet',
+            ZONES_JSON: "https://cdn.jsdelivr.net/gh/gn-math/assets@main/zones.json",
+            COVER_BASE: "https://cdn.jsdelivr.net/gh/gn-math/covers@main",
+            HTML_BASE: "https://cdn.jsdelivr.net/gh/gn-math/html@main"
+        };
 
-        // Initialize localStorage
-        function initializeStorage() {
-            if (!localStorage.getItem('gamePassword')) {
-                localStorage.setItem('gamePassword', DEFAULT_USER_PASSWORD);
-            }
-            if (!localStorage.getItem('adminChangelog')) {
-                localStorage.setItem('adminChangelog', 'Welcome to the game site! Check back for updates.');
-            }
-            if (!localStorage.getItem('adminPopupMessage')) {
-                localStorage.setItem('adminPopupMessage', '');
-            }
-            if (!localStorage.getItem('showPopup')) {
-                localStorage.setItem('showPopup', 'false');
-            }
-        }
+        let allGames = [];
+        let currentGameUrl = "";
 
-        // Check authentication
-        function isAuthenticated() {
-            return sessionStorage.getItem('authenticated') === 'true';
-        }
-
-        function isAdminLoggedIn() {
-            return sessionStorage.getItem('adminAuthenticated') === 'true';
-        }
-
-        // Show password screen
-        function showPasswordScreen() {
-            const existing = document.getElementById('passwordScreen');
-            if (existing) existing.remove();
-            
-            const passwordScreen = document.createElement('div');
-            passwordScreen.id = 'passwordScreen';
-            passwordScreen.innerHTML = `
-                <div class="password-container">
-                    <div class="password-box">
-                        <h1>🎮 Game Access</h1>
-                        <p>Enter password to continue</p>
-                        <input type="password" id="passwordInput" placeholder="Enter password" />
-                        <button onclick="checkPassword()">Enter</button>
-                        <button onclick="showAdminLogin()" class="admin-btn">Admin Login</button>
-                        <p id="passwordError" class="error"></p>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(passwordScreen);
-            setTimeout(() => document.getElementById('passwordInput').focus(), 100);
-        }
-
-        // Show admin login
-        function showAdminLogin() {
-            const passwordScreen = document.getElementById('passwordScreen');
-            passwordScreen.innerHTML = `
-                <div class="password-container">
-                    <div class="password-box">
-                        <h1>🔐 Admin Login</h1>
-                        <p>Enter admin credentials</p>
-                        <input type="password" id="adminPasswordInput" placeholder="Admin password" />
-                        <button onclick="checkAdminPassword()">Login</button>
-                        <button onclick="showPasswordScreen()" class="back-btn">Back</button>
-                        <p id="adminError" class="error"></p>
-                    </div>
-                </div>
-            `;
-            setTimeout(() => document.getElementById('adminPasswordInput').focus(), 100);
-        }
-
-        // Check user password
+        // --- AUTH LOGIC ---
         function checkPassword() {
-            const input = document.getElementById('passwordInput');
-            const error = document.getElementById('passwordError');
-            const correctPassword = localStorage.getItem('gamePassword');
-            
-            if (input.value === correctPassword) {
-                sessionStorage.setItem('authenticated', 'true');
-                document.getElementById('passwordScreen').remove();
-                showMainContent();
-                checkForPopup();
+            const input = document.getElementById('passwordInput').value;
+            const correct = localStorage.getItem('gamePassword') || CONFIG.DEFAULT_PASS;
+            if (input === correct) {
+                sessionStorage.setItem('isAuthed', 'true');
+                location.reload();
             } else {
-                error.textContent = 'Incorrect password!';
-                input.value = '';
-                input.focus();
+                document.getElementById('passwordError').textContent = "Access Denied.";
             }
         }
 
-        // Check admin password
-        function checkAdminPassword() {
-            const input = document.getElementById('adminPasswordInput');
-            const error = document.getElementById('adminError');
-            
-            if (input.value === ADMIN_PASSWORD) {
-                sessionStorage.setItem('adminAuthenticated', 'true');
-                document.getElementById('passwordScreen').remove();
-                showAdminPanel();
-            } else {
-                error.textContent = 'Incorrect admin password!';
-                input.value = '';
-                input.focus();
+        function logout() {
+            sessionStorage.clear();
+            location.reload();
+        }
+
+        // --- GAME LOGIC ---
+        async function fetchGames() {
+            try {
+                const res = await fetch(CONFIG.ZONES_JSON + "?v=" + Date.now());
+                allGames = await res.json();
+                renderGrids(allGames);
+                checkChangelog();
+            } catch (err) {
+                document.getElementById('container').innerText = "Critical error loading data.";
             }
         }
 
-        // Show main content
-        function showMainContent() {
-            document.getElementById('mainContent').classList.remove('content-hidden');
-        }
+        function renderGrids(data) {
+            const container = document.getElementById('container');
+            const featured = document.getElementById('featuredZones');
+            container.innerHTML = "";
+            featured.innerHTML = "";
 
-        // Show admin panel
-        function showAdminPanel() {
-            const existing = document.getElementById('adminPanel');
-            if (existing) existing.remove();
-            
-            const adminPanel = document.createElement('div');
-            adminPanel.id = 'adminPanel';
-            
-            const currentChangelog = localStorage.getItem('adminChangelog');
-            const currentPopup = localStorage.getItem('adminPopupMessage');
-            const showPopup = localStorage.getItem('showPopup') === 'true';
-            
-            adminPanel.innerHTML = `
-                <div class="admin-container">
-                    <div class="admin-box">
-                        <h1>⚙️ Admin Panel</h1>
-                        
-                        <div class="admin-section">
-                            <h2>Change User Password</h2>
-                            <input type="text" id="newPassword" placeholder="New user password" />
-                            <button onclick="changeUserPassword()">Update Password</button>
-                        </div>
-                        
-                        <div class="admin-section">
-                            <h2>Changelog</h2>
-                            <textarea id="changelogText" rows="5">${currentChangelog}</textarea>
-                            <button onclick="updateChangelog()">Update Changelog</button>
-                        </div>
-                        
-                        <div class="admin-section">
-                            <h2>Popup Message</h2>
-                            <textarea id="popupText" rows="3">${currentPopup}</textarea>
-                            <label>
-                                <input type="checkbox" id="enablePopup" ${showPopup ? 'checked' : ''} />
-                                Enable popup on login
-                            </label>
-                            <button onclick="updatePopup()">Update Popup</button>
-                        </div>
-                        
-                        <div class="admin-section">
-                            <h2>View Changelog</h2>
-                            <button onclick="viewChangelog()">View Current Changelog</button>
-                        </div>
-                        
-                        <button onclick="adminLogout()" class="logout-btn">Logout</button>
-                        <p id="adminSuccess" class="success"></p>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(adminPanel);
-        }
-
-        // Change user password
-        function changeUserPassword() {
-            const newPassword = document.getElementById('newPassword').value;
-            const success = document.getElementById('adminSuccess');
-            
-            if (newPassword.length < 3) {
-                success.textContent = 'Password must be at least 3 characters!';
-                success.className = 'error';
-                return;
-            }
-            
-            localStorage.setItem('gamePassword', newPassword);
-            success.textContent = 'User password updated successfully!';
-            success.className = 'success';
-            document.getElementById('newPassword').value = '';
-        }
-
-        // Update changelog
-        function updateChangelog() {
-            const changelog = document.getElementById('changelogText').value;
-            const success = document.getElementById('adminSuccess');
-            
-            localStorage.setItem('adminChangelog', changelog);
-            success.textContent = 'Changelog updated successfully!';
-            success.className = 'success';
-        }
-
-        // Update popup
-        function updatePopup() {
-            const popup = document.getElementById('popupText').value;
-            const enabled = document.getElementById('enablePopup').checked;
-            const success = document.getElementById('adminSuccess');
-            
-            localStorage.setItem('adminPopupMessage', popup);
-            localStorage.setItem('showPopup', enabled.toString());
-            success.textContent = 'Popup settings updated successfully!';
-            success.className = 'success';
-        }
-
-        // View changelog
-        function viewChangelog() {
-            const changelog = localStorage.getItem('adminChangelog');
-            alert('Current Changelog:\\n\\n' + changelog);
-        }
-
-        // Admin logout
-        function adminLogout() {
-            sessionStorage.removeItem('adminAuthenticated');
-            document.getElementById('adminPanel').remove();
-            showPasswordScreen();
-        }
-
-        // Check for popup
-        function checkForPopup() {
-            const showPopup = localStorage.getItem('showPopup') === 'true';
-            const popupMessage = localStorage.getItem('adminPopupMessage');
-            
-            if (showPopup && popupMessage) {
-                setTimeout(() => {
-                    alert(popupMessage);
-                }, 500);
-            }
-        }
-
-        // Handle Enter key
-        document.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                const passwordInput = document.getElementById('passwordInput');
-                const adminPasswordInput = document.getElementById('adminPasswordInput');
-                
-                if (passwordInput && document.activeElement === passwordInput) {
-                    checkPassword();
-                } else if (adminPasswordInput && document.activeElement === adminPasswordInput) {
-                    checkAdminPassword();
+            data.forEach((game, index) => {
+                const card = createCard(game);
+                container.appendChild(card);
+                if (game.featured || index < 4) {
+                    featured.appendChild(card.cloneNode(true));
                 }
-            }
-        });
-
-        // Initialize on page load
-        window.addEventListener('DOMContentLoaded', () => {
-            initializeStorage();
+            });
             
-            if (!isAuthenticated() && !isAdminLoggedIn()) {
-                showPasswordScreen();
-            } else if (isAuthenticated()) {
-                showMainContent();
-                checkForPopup();
-            } else if (isAdminLoggedIn()) {
-                showAdminPanel();
-            }
-        });
-    </script>
+            // Re-attach listeners to cloned nodes
+            document.querySelectorAll('.zone-item').forEach((item, idx) => {
+                const gameName = item.querySelector('.info').innerText;
+                const gameObj = allGames.find(g => g.name === gameName);
+                item.onclick = () => launchGame(gameObj);
+            });
+        }
 
-    <!-- Original gnmath.js script would go here -->
-    <script src="https://cdn.jsdelivr.net/npm/gn-math.github.io-main@1.0.5/gnmath.js"></script>
+        function createCard(game) {
+            const div = document.createElement('div');
+            div.className = "zone-item";
+            const img = game.cover.replace("{COVER_URL}", CONFIG.COVER_BASE);
+            div.innerHTML = `<img src="${img}"><div class="info">${game.name}</div>`;
+            return div;
+        }
+
+        function launchGame(game) {
+            const viewer = document.getElementById('zoneViewer');
+            const frame = document.getElementById('zoneFrame');
+            currentGameUrl = game.url.replace("{HTML_URL}", CONFIG.HTML_BASE);
+            
+            document.getElementById('activeGameTitle').innerText = game.name;
+            frame.src = currentGameUrl;
+            viewer.style.display = "flex";
+            document.body.style.overflow = "hidden";
+        }
+
+        function closeZone() {
+            document.getElementById('zoneViewer').style.display = "none";
+            document.getElementById('zoneFrame').src = "";
+            document.body.style.overflow = "auto";
+        }
+
+        function openInNewTab() {
+            if (currentGameUrl) window.open(currentGameUrl, '_blank');
+        }
+
+        function filterZones() {
+            const query = document.getElementById('searchBar').value.toLowerCase();
+            const filtered = allGames.filter(g => g.name.toLowerCase().includes(query));
+            renderGrids(filtered);
+        }
+
+        // --- CHANGELOG LOGIC ---
+        function checkChangelog() {
+            const lastSeen = localStorage.getItem('lastChangelogSeen');
+            const currentContent = localStorage.getItem('adminChangelog') || "Welcome to the new dashboard!";
+            
+            if (lastSeen !== currentContent) {
+                document.getElementById('changelogBody').innerHTML = currentContent;
+                document.getElementById('changelogModal').style.display = "flex";
+            }
+        }
+
+        function closeChangelog() {
+            const currentContent = localStorage.getItem('adminChangelog') || "Welcome to the new dashboard!";
+            localStorage.setItem('lastChangelogSeen', currentContent);
+            document.getElementById('changelogModal').style.display = "none";
+        }
+
+        // --- INIT ---
+        window.onload = () => {
+            if (sessionStorage.getItem('isAuthed') === 'true') {
+                document.getElementById('mainContent').classList.remove('content-hidden');
+                fetchGames();
+            } else {
+                document.getElementById('passwordScreen').classList.remove('content-hidden');
+            }
+        };
+    </script>
 </body>
 </html>
